@@ -1,0 +1,9 @@
+{
+  "wifi": ["internet", "network", "wireless", "connect", "hotspot", "wi-fi", "router", "ethernet", "lan", "wlan", "connection", "online", "broadband", "modem"],
+  "printer": ["print", "printing", "cups", "scanner", "scan", "paper", "ink", "laser", "hp", "canon", "epson", "driver"],
+  "updates": ["update", "upgrade", "patch", "security", "apt", "refresh", "latest", "version", "outdated", "dist-upgrade"],
+  "software": ["install", "remove", "uninstall", "app", "application", "package", "program", "apt-get", "snap", "flatpak", "store", "download"],
+  "permissions": ["permission", "denied", "access", "chmod", "chown", "sudo", "root", "admin", "administrator", "privilege", "restricted", "ownership"],
+  "files": ["file", "folder", "directory", "copy", "move", "delete", "rename", "backup", "storage", "disk", "space", "nautilus", "explorer", "manager"],
+  "terminal": ["terminal", "command", "bash", "shell", "cli", "console", "prompt", "commandline", "cmd", "powershell", "script"]
+}

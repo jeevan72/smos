@@ -1,0 +1,61 @@
+# Core System
+ubuntu-desktop
+ubuntu-drivers-common
+
+# Web
+firefox
+
+# Office
+libreoffice
+libreoffice-calc
+libreoffice-writer
+libreoffice-impress
+
+# Media
+vlc
+gimp
+shotwell
+cheese
+
+# Utilities
+gnome-tweaks
+gnome-shell-extensions
+dconf-editor
+synaptic
+gdebi
+timeshift
+stacer
+
+# System Tools
+htop
+neofetch
+curl
+wget
+git
+nano
+vim
+
+# Python (for SimpleMode assistant)
+python3
+python3-pip
+python3-venv
+
+# Network
+network-manager
+network-manager-gnome
+
+# Accessibility
+gnome-accessibility-themes
+orca
+onboard
+
+# Fonts
+fonts-noto
+fonts-liberation
+fonts-ubuntu
+
+# Printing
+cups
+system-config-printer
+hplip
+printer-driver-all

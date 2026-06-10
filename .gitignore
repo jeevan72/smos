@@ -1,0 +1,32 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# ISO files (large)
+iso/
+cubic-project/
+
+# Profile (user-specific)
+.simplemode-profile
+*.pyc
+*.pyo
+.env
+
+# Node
+node_modules/
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
