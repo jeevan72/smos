@@ -91,7 +91,7 @@ apt install -y \
     python3 python3-pip python3-venv \
     whiptail dialog figlet \
     firefox vlc gimp libreoffice \
-    gnome-tweaks gnome-shell-extensions gnome-shell-extension-dash-to-panel \
+    gnome-tweaks gnome-shell-extensions gnome-shell-extension-dash-to-panel gnome-shell-extension-ubuntu-dock \
     synaptic gdebi timeshift \
     htop neofetch curl wget git nano \
     network-manager network-manager-gnome \

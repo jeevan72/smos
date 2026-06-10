@@ -7,7 +7,7 @@
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROFILE_FILE="${PROJECT_DIR}/.simplemode-profile"
+PROFILE_FILE="${HOME}/.simplemode-profile"
 
 # Colors for non-whiptail output
 GREEN='\033[0;32m'
@@ -135,6 +135,9 @@ Apply these settings?" \
 # Step 5: Save Profile & Apply Settings
 #------------------------------------------------------
 apply_settings() {
+    # Ensure extensions are allowed
+    gsettings set org.gnome.shell disable-user-extensions false 2>/dev/null || true
+
     # 1. Apply User Type (Scaling)
     if [ "$USER_TYPE" == "elder" ]; then
         gsettings set org.gnome.desktop.interface text-scaling-factor 1.25 2>/dev/null || true
