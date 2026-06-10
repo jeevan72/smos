@@ -56,8 +56,10 @@ echo ""
 #------------------------------------------------------
 echo -e "${BOLD}━━━ Step 1/6: System Dependencies ━━━${NC}"
 
-sudo apt update -qq 2>/dev/null
+echo "Updating package list..."
+sudo apt update || print_err "apt update had some errors, continuing anyway..."
 
+echo "Installing required packages..."
 sudo apt install -y \
     python3 \
     python3-pip \
@@ -68,8 +70,7 @@ sudo apt install -y \
     whiptail \
     dialog \
     figlet \
-    toilet \
-    2>/dev/null
+    toilet || print_err "Failed to install some packages"
 
 print_step "System packages installed"
 
