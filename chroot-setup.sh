@@ -19,9 +19,8 @@ echo "║  🐧 SimpleMode OS — Chroot Customization    ║"
 echo "╚══════════════════════════════════════════════╝"
 echo ""
 
-# The Cubic project directory is mounted, find our files
-# Cubic mounts the project dir — files we copied are available
-SETUP_DIR="/tmp"
+# The directory where the script is located (the git clone directory)
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SIMPLEMODE_DIR="/opt/simplemode"
 
 #------------------------------------------------------
@@ -30,8 +29,8 @@ SIMPLEMODE_DIR="/opt/simplemode"
 echo "━━━ Step 1/6: Applying Branding ━━━"
 
 # Custom os-release
-if [ -f "${SETUP_DIR}/os-release" ]; then
-    cp "${SETUP_DIR}/os-release" /etc/os-release
+if [ -f "${PROJECT_DIR}/debian/branding/os-release" ]; then
+    cp "${PROJECT_DIR}/debian/branding/os-release" /etc/os-release
     echo "[✓] os-release updated"
 else
     # Write it inline
@@ -43,9 +42,9 @@ VERSION="1.0 (Adaptive)"
 VERSION_CODENAME=adaptive
 ID=simplemode
 ID_LIKE=ubuntu debian
-HOME_URL="https://github.com/YOUR_USER/simplemode-os"
-SUPPORT_URL="https://github.com/YOUR_USER/simplemode-os/issues"
-BUG_REPORT_URL="https://github.com/YOUR_USER/simplemode-os/issues"
+HOME_URL="https://github.com/jeevan72/smos"
+SUPPORT_URL="https://github.com/jeevan72/smos/issues"
+BUG_REPORT_URL="https://github.com/jeevan72/smos/issues"
 UBUNTU_CODENAME=noble
 OSEOF
     echo "[✓] os-release created"
@@ -109,13 +108,14 @@ echo "[✓] Bloat removed"
 echo ""
 echo "━━━ Step 4/6: Installing SimpleMode Tools ━━━"
 
-mkdir -p ${SIMPLEMODE_DIR}/{assistant,knowledge}
+mkdir -p "${SIMPLEMODE_DIR}"
 
-# Copy assistant
-if [ -d "${SETUP_DIR}/simplemode-files" ]; then
-    cp -r "${SETUP_DIR}/simplemode-files/"* ${SIMPLEMODE_DIR}/
-    echo "[✓] SimpleMode files copied"
-fi
+# Copy simplemode tools from the repository
+cp -r "${PROJECT_DIR}/assistant" "${SIMPLEMODE_DIR}/"
+cp -r "${PROJECT_DIR}/knowledge" "${SIMPLEMODE_DIR}/"
+cp "${PROJECT_DIR}/simplemode-assistant.sh" "${SIMPLEMODE_DIR}/"
+cp "${PROJECT_DIR}/simplemode-wizard.sh" "${SIMPLEMODE_DIR}/"
+echo "[✓] SimpleMode files copied to ${SIMPLEMODE_DIR}"
 
 # Set up Python venv for the assistant
 python3 -m venv ${SIMPLEMODE_DIR}/venv

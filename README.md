@@ -18,54 +18,48 @@ SimpleMode OS is a customized Ubuntu-based operating system (built with **Cubic*
 - **PageTree Knowledge System** — Keyword-mapped documentation (no LLM required)
 - **Cubic ISO Builder** — Scripts to build custom Ubuntu ISO
 
-## 🚀 Quick Start
+## 🚀 How to Build the OS (For Developers)
 
-### 1. Clone the Repository
+SimpleMode OS is designed to be built using **Cubic** (Custom Ubuntu ISO Creator). You can use any existing Ubuntu 24.04 ISO.
 
-```bash
-git clone https://github.com/YOUR_USER/simplemode-os.git
-cd simplemode-os
-```
+### 1. Launch Cubic
+On your host machine, run Cubic and select your base Ubuntu ISO. Proceed through the wizard until you reach the **Virtual Environment (Chroot)** terminal page.
 
-### 2. Run Setup Script
-
-```bash
-chmod +x setup.sh
-./setup.sh
-```
-
-This installs: Python venv (RapidFuzz, Rich), whiptail/dialog, Cubic, and verifies project structure.
-
-### 3. Run the Onboarding Wizard
+### 2. Clone Repository Inside Cubic
+Inside the Cubic chroot terminal, run:
 
 ```bash
-./simplemode-wizard.sh
+git clone https://github.com/jeevan72/smos.git /opt/simplemode-src
+cd /opt/simplemode-src
 ```
 
-Terminal UI wizard — select user type (Elder/Beginner/Advanced) and desktop style (Windows/macOS/Linux).
-
-### 4. Run the Terminal Assistant
+### 3. Run the OS Integration Script
+Execute the chroot configuration script to bake SimpleMode OS natively into the system:
 
 ```bash
-./simplemode-assistant.sh
+chmod +x chroot-setup.sh
+./chroot-setup.sh
 ```
 
-Ask questions like:
-- `how do i instal wfi` → auto-corrects → shows WiFi guide
-- `upadte my system` → auto-corrects → shows update guide
-- `permission denied` → shows permissions guide
+This automatically:
+- Installs all necessary dependencies (Python, Whiptail, accessibility tools)
+- Removes bloatware
+- Configures the **Global Command Interceptor** in `/etc/bash.bashrc`
+- Installs the **PageTree Knowledge Base** and **Typo Correction Engine**
+- Sets the adaptive onboarding wizard to run automatically on first-boot
 
-### 5. Build Custom ISO (with Cubic)
+### 4. Generate ISO
+Click **Next** in Cubic to compress the filesystem and generate your custom, bootable `simplemode-os.iso`.
 
-```bash
-./download-iso.sh    # Download Ubuntu 24.04 base ISO
-./build-iso.sh       # Prepare and launch Cubic
-```
+---
 
-Inside Cubic's chroot terminal, run:
-```bash
-bash /tmp/chroot-setup.sh
-```
+## 💻 End-User Experience (Once Installed)
+
+When an end-user installs and boots SimpleMode OS, everything works automatically. **The user does not need to run any manual setup scripts.**
+
+- **Adaptive First Boot**: The `simplemode-wizard` launches automatically upon first login, asking for their experience level (Elder/Beginner/Advanced) and preferred layout style.
+- **Smart Terminal**: If the user opens a terminal and types a bad command (e.g., `updat` or `instal vlc`), the OS intercepts it natively, corrects it to `sudo apt update` or `sudo apt install vlc`, and executes it automatically after a 3-second countdown.
+- **AI Assistant**: The user can type `help` at any time in the terminal to invoke the adaptive chat assistant, which has local knowledge about WiFi, Printers, Permissions, Updates, and more.
 
 ## 📁 Project Structure
 
