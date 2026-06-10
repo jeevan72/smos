@@ -192,6 +192,13 @@ echo "[✓] Command interceptor configured in /etc/bash.bashrc"
 echo ""
 echo "━━━ Step 5/6: Desktop Customization ━━━"
 
+# Install Wallpaper
+if [ -f "${PROJECT_DIR}/debian/branding/wallpapers/smos-default.png" ]; then
+    mkdir -p /usr/share/backgrounds
+    cp "${PROJECT_DIR}/debian/branding/wallpapers/smos-default.png" /usr/share/backgrounds/
+    echo "[✓] Default wallpaper installed"
+fi
+
 # GNOME schema overrides for default settings
 mkdir -p /usr/share/glib-2.0/schemas/
 cat > /usr/share/glib-2.0/schemas/99_simplemode.gschema.override <<'SCHEMAEOF'
@@ -201,6 +208,11 @@ icon-theme='Adwaita'
 font-name='Noto Sans 11'
 document-font-name='Noto Sans 11'
 monospace-font-name='Noto Sans Mono 11'
+
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/smos-default.png'
+picture-uri-dark='file:///usr/share/backgrounds/smos-default.png'
+picture-options='zoom'
 
 [org.gnome.desktop.wm.preferences]
 titlebar-font='Noto Sans Bold 11'
