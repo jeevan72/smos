@@ -145,6 +145,34 @@ chmod +x /usr/local/bin/simplemode-wizard
 
 echo "[✓] Commands installed: simplemode-assistant, simplemode-wizard"
 
+# Configure command interceptor globally in /etc/bash.bashrc
+cat >> /etc/bash.bashrc <<'GLOBALBASHRC'
+
+# --- SimpleMode OS Command Interceptor ---
+if [ -f "/opt/simplemode/assistant/interceptor.py" ]; then
+    # Backup original command_not_found_handle if it exists and hasn't been backed up yet
+    if declare -f command_not_found_handle >/dev/null && ! declare -f original_command_not_found_handle >/dev/null; then
+        eval "original_$(declare -f command_not_found_handle)"
+    fi
+
+    command_not_found_handle() {
+        /opt/simplemode/venv/bin/python3 "/opt/simplemode/assistant/interceptor.py" "$@"
+        local status=$?
+        if [ $status -eq 127 ]; then
+            if declare -f original_command_not_found_handle >/dev/null; then
+                original_command_not_found_handle "$@"
+            else
+                echo "bash: $1: command not found" >&2
+                return 127
+            fi
+        else
+            return $status
+        fi
+    }
+fi
+GLOBALBASHRC
+echo "[✓] Command interceptor configured in /etc/bash.bashrc"
+
 #------------------------------------------------------
 # 5. Desktop Customization (GNOME)
 #------------------------------------------------------
