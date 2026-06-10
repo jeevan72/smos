@@ -132,8 +132,49 @@ Apply these settings?" \
 }
 
 #------------------------------------------------------
-# Step 5: Save Profile & Apply
+# Step 5: Save Profile & Apply Settings
 #------------------------------------------------------
+apply_settings() {
+    # 1. Apply User Type (Scaling)
+    if [ "$USER_TYPE" == "elder" ]; then
+        gsettings set org.gnome.desktop.interface text-scaling-factor 1.25 2>/dev/null || true
+        gsettings set org.gnome.desktop.interface cursor-size 48 2>/dev/null || true
+    else
+        gsettings set org.gnome.desktop.interface text-scaling-factor 1.0 2>/dev/null || true
+        gsettings set org.gnome.desktop.interface cursor-size 24 2>/dev/null || true
+    fi
+
+    # 2. Apply Desktop Style
+    case "$DESKTOP_STYLE" in
+        windows)
+            # Enable dash-to-panel
+            gnome-extensions enable dash-to-panel@jderose9.github.com 2>/dev/null || true
+            gnome-extensions disable ubuntu-dock@ubuntu.com 2>/dev/null || true
+            gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close' 2>/dev/null || true
+            ;;
+        macos)
+            # Enable dock, move to bottom
+            gnome-extensions disable dash-to-panel@jderose9.github.com 2>/dev/null || true
+            gnome-extensions enable ubuntu-dock@ubuntu.com 2>/dev/null || true
+            gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM' 2>/dev/null || true
+            gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false 2>/dev/null || true
+            gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false 2>/dev/null || true
+            gsettings set org.gnome.shell.extensions.dash-to-dock intellihide true 2>/dev/null || true
+            # macOS window buttons on the left
+            gsettings set org.gnome.desktop.wm.preferences button-layout 'close,minimize,maximize:appmenu' 2>/dev/null || true
+            ;;
+        linux)
+            # Default GNOME (Dock on left)
+            gnome-extensions disable dash-to-panel@jderose9.github.com 2>/dev/null || true
+            gnome-extensions enable ubuntu-dock@ubuntu.com 2>/dev/null || true
+            gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'LEFT' 2>/dev/null || true
+            gsettings set org.gnome.shell.extensions.dash-to-dock extend-height true 2>/dev/null || true
+            gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed true 2>/dev/null || true
+            gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close' 2>/dev/null || true
+            ;;
+    esac
+}
+
 save_profile() {
     # Save profile to file
     cat > "$PROFILE_FILE" <<EOF
@@ -166,6 +207,7 @@ run_wizard() {
     select_user_type
     select_desktop_style
     confirm_selection
+    apply_settings
     save_profile
 }
 

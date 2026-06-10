@@ -65,6 +65,13 @@ LSBEOF
     echo "[✓] lsb-release updated"
 fi
 
+# GRUB Branding
+if [ -f /etc/default/grub ]; then
+    sed -i 's/GRUB_DISTRIBUTOR=.*/GRUB_DISTRIBUTOR="SMOS"/g' /etc/default/grub
+    update-grub 2>/dev/null || true
+    echo "[✓] GRUB bootloader branded as SMOS"
+fi
+
 #------------------------------------------------------
 # 2. Update & Install Packages
 #------------------------------------------------------
@@ -84,7 +91,7 @@ apt install -y \
     python3 python3-pip python3-venv \
     whiptail dialog figlet \
     firefox vlc gimp libreoffice \
-    gnome-tweaks gnome-shell-extensions \
+    gnome-tweaks gnome-shell-extensions gnome-shell-extension-dash-to-panel \
     synaptic gdebi timeshift \
     htop neofetch curl wget git nano \
     network-manager network-manager-gnome \
