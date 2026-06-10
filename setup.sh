@@ -145,6 +145,42 @@ chmod +x "${PROJECT_DIR}/build-iso.sh" 2>/dev/null || true
 chmod +x "${PROJECT_DIR}/download-iso.sh" 2>/dev/null || true
 chmod +x "${PROJECT_DIR}/debian/welcome/welcome.sh" 2>/dev/null || true
 chmod +x "${PROJECT_DIR}/chroot-setup.sh" 2>/dev/null || true
+chmod +x "${PROJECT_DIR}/run.sh" 2>/dev/null || true
+chmod +x "${PROJECT_DIR}/assistant/interceptor.py" 2>/dev/null || true
+
+# Add interceptor to ~/.bashrc if not already present
+BASHRC_HOOK_CMD="python3 ${PROJECT_DIR}/assistant/interceptor.py"
+if ! grep -q "interceptor.py" ~/.bashrc 2>/dev/null; then
+    print_info "Configuring command interceptor in ~/.bashrc..."
+    cat >> ~/.bashrc <<BASHRC_EOF
+
+# --- SimpleMode OS Command Interceptor ---
+if [ -f "${PROJECT_DIR}/assistant/interceptor.py" ]; then
+    # Backup original command_not_found_handle if it exists and hasn't been backed up yet
+    if declare -f command_not_found_handle >/dev/null && ! declare -f original_command_not_found_handle >/dev/null; then
+        eval "original_\$(declare -f command_not_found_handle)"
+    fi
+
+    command_not_found_handle() {
+        python3 "${PROJECT_DIR}/assistant/interceptor.py" "\$@"
+        local status=\$?
+        if [ \$status -eq 127 ]; then
+            if declare -f original_command_not_found_handle >/dev/null; then
+                original_command_not_found_handle "\$@"
+            else
+                echo "bash: \$1: command not found" >&2
+                return 127
+            fi
+        else
+            return \$status
+        fi
+    }
+fi
+BASHRC_EOF
+    print_step "Command interceptor configured in ~/.bashrc"
+else
+    print_info "Command interceptor already configured in ~/.bashrc"
+fi
 
 print_step "Scripts made executable"
 
