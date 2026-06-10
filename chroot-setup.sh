@@ -71,7 +71,13 @@ fi
 echo ""
 echo "━━━ Step 2/6: Installing Packages ━━━"
 
-apt update -qq
+# Remove the cdrom repository which causes apt update to fail inside the Cubic chroot
+sed -i '/cdrom/d' /etc/apt/sources.list 2>/dev/null || true
+if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
+    sed -i 's/.*cdrom.*//g' /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+fi
+
+apt update || echo "[!] apt update had some errors, continuing anyway..."
 
 # Core packages
 apt install -y \
