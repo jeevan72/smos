@@ -18,7 +18,20 @@ SimpleMode OS is a customized Ubuntu-based operating system (built with **Cubic*
 - **PageTree Knowledge System** — Keyword-mapped documentation (no LLM required)
 - **Cubic ISO Builder** — Scripts to build custom Ubuntu ISO
 
-## 🚀 How to Build the OS (For Developers)
+## 🚀 Quick Install (Local Setup)
+
+To install and test SimpleMode OS features on your current Ubuntu system, simply run the following commands in your terminal:
+
+```bash
+git clone https://github.com/jeevan72/smos.git
+cd smos
+chmod +x setup.sh
+./setup.sh
+```
+
+> **Note:** Do not run `setup.sh` with `sudo` (e.g., `sudo ./setup.sh`). The script will automatically prompt for your password when administrative permissions are needed.
+
+## 🛠️ How to Build the OS ISO (For Developers)
 
 SimpleMode OS is designed to be built using **Cubic** (Custom Ubuntu ISO Creator). You can use any existing Ubuntu 24.04 ISO.
 
