@@ -1,0 +1,3 @@
+# Ignore demo directory and graphify output from GitHub's language statistics
+demo/* linguist-vendored
+graphify-out/* linguist-generated

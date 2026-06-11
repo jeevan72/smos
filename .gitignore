@@ -32,3 +32,5 @@ Thumbs.db
 *.sublime-*
 custom-root/
 custom-disk/
+graphify-out/
+test_whiptail.sh
