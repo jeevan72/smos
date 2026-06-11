@@ -98,6 +98,7 @@ apt install -y \
     gnome-accessibility-themes orca onboard \
     fonts-noto fonts-liberation \
     cups system-config-printer hplip printer-driver-all \
+    flatpak \
     2>/dev/null || echo "[!] Some packages may not be available"
 
 echo "[✓] Packages installed"

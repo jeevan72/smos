@@ -70,6 +70,7 @@ sudo apt install -y \
     whiptail \
     dialog \
     figlet \
+    flatpak \
     toilet || print_err "Failed to install some packages"
 
 print_step "System packages installed"
