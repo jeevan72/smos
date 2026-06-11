@@ -16,7 +16,6 @@ SimpleMode OS is a customized Ubuntu-based operating system (built with **Cubic*
 - **Built-in Terminal Assistant** — Chat-based help with typo correction and knowledge base
 - **Smart Typo Correction** — Levenshtein + RapidFuzz fuzzy matching
 - **PageTree Knowledge System** — Keyword-mapped documentation (no LLM required)
-- **Cubic ISO Builder** — Scripts to build custom Ubuntu ISO
 
 ## 🚀 Quick Install (Local Setup)
 
@@ -81,8 +80,6 @@ simplemode-os/
 ├── setup.sh                    # One-click setup (installs everything)
 ├── simplemode-wizard.sh        # Terminal onboarding wizard (whiptail)
 ├── simplemode-assistant.sh     # Terminal assistant launcher
-├── build-iso.sh                # Cubic ISO builder
-├── download-iso.sh             # Ubuntu ISO downloader
 ├── chroot-setup.sh             # Runs inside Cubic chroot
 │
 ├── assistant/
@@ -130,7 +127,7 @@ Adaptive Response (mode-aware)
 
 | Phase | Features | Status |
 |-------|----------|--------|
-| Phase 1 | Onboarding, Adaptive UI, Typo Fix, PageTree, Assistant, Cubic ISO | ✅ Done |
+| Phase 1 | Onboarding, Adaptive UI, Typo Fix, PageTree, Assistant | ✅ Done |
 | Phase 2 | Intent Classification (TF-IDF), Action Engine, Voice | 🔄 Next |
 | Phase 3 | Local LLM (Qwen2.5/Phi-3), Enhanced Responses | 🚀 Planned |
 | Phase 4 | Hybrid AI (Smart Router), Query Optimization | 🚀 Planned |
