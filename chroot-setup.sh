@@ -177,11 +177,9 @@ if [ -f "/opt/simplemode/assistant/interceptor.py" ]; then
                 original_command_not_found_handle "$@"
             else
                 echo "bash: $1: command not found" >&2
-                return 127
             fi
-        else
-            return $status
         fi
+        return $status
     }
 fi
 GLOBALBASHRC
@@ -232,27 +230,9 @@ echo "[✓] GNOME defaults configured"
 echo ""
 echo "━━━ Step 6/6: Setting Up First-Boot Welcome ━━━"
 
-# Copy welcome script
-cat > /usr/local/bin/simplemode-welcome <<'WELCOMEEOF'
-#!/bin/bash
-WELCOME_FLAG="$HOME/.simplemode-welcomed"
-if [ -f "$WELCOME_FLAG" ]; then
-    exit 0
-fi
-if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
-    exit 0
-fi
-# Run the onboarding wizard in a terminal
-if command -v gnome-terminal &> /dev/null; then
-    gnome-terminal -- bash -c "simplemode-wizard; echo ''; echo 'Press Enter to close...'; read"
-elif command -v xfce4-terminal &> /dev/null; then
-    xfce4-terminal -e "bash -c 'simplemode-wizard; read'"
-elif command -v xterm &> /dev/null; then
-    xterm -e "simplemode-wizard; read"
-fi
-touch "$WELCOME_FLAG"
-rm -f "$HOME/.config/autostart/simplemode-welcome.desktop" 2>/dev/null
-WELCOMEEOF
+# Install welcome script (kept in sync with debian/welcome/welcome.sh)
+mkdir -p /usr/local/bin
+cp "${PROJECT_DIR}/debian/welcome/welcome.sh" /usr/local/bin/simplemode-welcome
 chmod +x /usr/local/bin/simplemode-welcome
 
 # Create autostart entry (runs on first login)

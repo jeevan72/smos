@@ -1,6 +1,9 @@
 # Core System
 ubuntu-desktop
 ubuntu-drivers-common
+# The interceptor hooks into bash's command_not_found_handle.
+# Install the default handler so unknown commands still give a sensible error.
+command-not-found
 
 # Web
 firefox
@@ -25,6 +28,7 @@ synaptic
 gdebi
 timeshift
 stacer
+gnome-terminal
 
 # System Tools
 htop
@@ -51,6 +55,7 @@ onboard
 
 # Fonts
 fonts-noto
+fonts-noto-mono
 fonts-liberation
 fonts-ubuntu
 

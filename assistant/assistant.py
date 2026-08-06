@@ -13,6 +13,15 @@ import sys
 import re
 from pathlib import Path
 
+# Ensure UTF-8 output on terminals with non-UTF-8 locales (e.g. C locale).
+# The assistant prints emoji and rich box-drawing characters that break
+# under cp1252 / latin-1.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except (AttributeError, ValueError):
+    pass
+
 try:
     from rich.console import Console
     from rich.panel import Panel

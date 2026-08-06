@@ -119,9 +119,9 @@ const Desktop = (() => {
 
             <!-- Profile Switcher (demo controls) -->
             <div class="profile-switcher">
-                <button onclick="Desktop.switchMode('elder')" class="${mode === 'elder' ? 'active' : ''}">Elder</button>
-                <button onclick="Desktop.switchMode('beginner')" class="${mode === 'beginner' ? 'active' : ''}">Beginner</button>
-                <button onclick="Desktop.switchMode('advanced')" class="${mode === 'advanced' ? 'active' : ''}">Advanced</button>
+                <button onclick="Desktop.switchMode('elder', this)" class="${mode === 'elder' ? 'active' : ''}">Elder</button>
+                <button onclick="Desktop.switchMode('beginner', this)" class="${mode === 'beginner' ? 'active' : ''}">Beginner</button>
+                <button onclick="Desktop.switchMode('advanced', this)" class="${mode === 'advanced' ? 'active' : ''}">Advanced</button>
                 <button onclick="Onboarding.reset()" style="color:var(--brand-accent)">Reset</button>
             </div>
 
@@ -187,14 +187,14 @@ const Desktop = (() => {
         }, 2000);
     }
 
-    function switchMode(mode) {
+    function switchMode(mode, el) {
         profile.userType = mode;
         document.body.setAttribute('data-mode', mode);
         // Update profile switcher buttons
         document.querySelectorAll('.profile-switcher button').forEach(btn => {
             btn.classList.remove('active');
         });
-        event.target.classList.add('active');
+        if (el) el.classList.add('active');
         localStorage.setItem('simplemode-profile', JSON.stringify(profile));
     }
 

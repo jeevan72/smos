@@ -13,10 +13,10 @@ else
     exit 1
 fi
 
-# Pass profile if it exists
+# Pass profile if it exists (the wizard saves it to $HOME)
 PROFILE_ARG=""
-if [ -f "${PROJECT_DIR}/.simplemode-profile" ]; then
-    source "${PROJECT_DIR}/.simplemode-profile"
+if [ -f "${HOME}/.simplemode-profile" ]; then
+    source "${HOME}/.simplemode-profile"
     PROFILE_ARG="--mode ${USER_TYPE:-beginner}"
 fi
 

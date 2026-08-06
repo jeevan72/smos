@@ -125,9 +125,10 @@ Apply these settings?" \
         $DIALOG_HEIGHT $DIALOG_WIDTH
 
     if [ $? -ne 0 ]; then
-        # User chose No — restart wizard
-        run_wizard
-        return
+        # User chose No — restart wizard from the first question
+        select_user_type
+        select_desktop_style
+        confirm_selection
     fi
 }
 
@@ -135,6 +136,12 @@ Apply these settings?" \
 # Step 5: Save Profile & Apply Settings
 #------------------------------------------------------
 apply_settings() {
+    # Only apply desktop settings when running in a graphical session.
+    # (e.g. SSH or first-run in the chroot has no display — skip silently.)
+    if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
+        return
+    fi
+
     # Ensure extensions are allowed
     gsettings set org.gnome.shell disable-user-extensions false 2>/dev/null || true
 
@@ -198,7 +205,7 @@ EOF
     echo ""
     echo -e "  ${YELLOW}What's next:${NC}"
     echo -e "    • Run the assistant:  ${CYAN}./simplemode-assistant.sh${NC}"
-    echo -e "    • Build the ISO:      ${CYAN}./build-iso.sh${NC}"
+    echo -e "    • Open the web demo:  ${CYAN}xdg-open demo/index.html${NC}"
     echo ""
 }
 
@@ -217,7 +224,10 @@ run_wizard() {
 # Check for whiptail
 if ! command -v whiptail &> /dev/null; then
     echo "Installing whiptail..."
-    sudo apt install -y whiptail 2>/dev/null
+    if ! sudo apt install -y whiptail 2>/dev/null; then
+        echo "ERROR: 'whiptail' is required for the wizard but could not be installed."
+        exit 1
+    fi
 fi
 
 run_wizard

@@ -114,31 +114,28 @@ chmod +x "${PROJECT_DIR}/run.sh" 2>/dev/null || true
 chmod +x "${PROJECT_DIR}/assistant/interceptor.py" 2>/dev/null || true
 
 # Add interceptor to ~/.bashrc if not already present
-BASHRC_HOOK_CMD="python3 ${PROJECT_DIR}/assistant/interceptor.py"
 if ! grep -q "interceptor.py" ~/.bashrc 2>/dev/null; then
     print_info "Configuring command interceptor in ~/.bashrc..."
-    cat >> ~/.bashrc <<BASHRC_EOF
+    cat >> ~/.bashrc <<'BASHRC_EOF'
 
 # --- SimpleMode OS Command Interceptor ---
 if [ -f "${PROJECT_DIR}/assistant/interceptor.py" ]; then
     # Backup original command_not_found_handle if it exists and hasn't been backed up yet
     if declare -f command_not_found_handle >/dev/null && ! declare -f original_command_not_found_handle >/dev/null; then
-        eval "original_\$(declare -f command_not_found_handle)"
+        eval "original_$(declare -f command_not_found_handle)"
     fi
 
     command_not_found_handle() {
-        python3 "${PROJECT_DIR}/assistant/interceptor.py" "\$@"
-        local status=\$?
-        if [ \$status -eq 127 ]; then
+        python3 "${PROJECT_DIR}/assistant/interceptor.py" "$@"
+        local status=$?
+        if [ $status -eq 127 ]; then
             if declare -f original_command_not_found_handle >/dev/null; then
-                original_command_not_found_handle "\$@"
+                original_command_not_found_handle "$@"
             else
-                echo "bash: \$1: command not found" >&2
-                return 127
+                echo "bash: $1: command not found" >&2
             fi
-        else
-            return \$status
         fi
+        return $status
     }
 fi
 BASHRC_EOF

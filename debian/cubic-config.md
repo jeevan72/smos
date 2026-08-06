@@ -51,17 +51,21 @@ apt remove -y gnome-games aisleriot gnome-mines gnome-sudoku
 
 ```bash
 # Copy wallpapers
-cp /path/to/debian/wallpapers/* /usr/share/backgrounds/
+cp /path/to/debian/branding/wallpapers/* /usr/share/backgrounds/
 
 # Set default wallpaper (for GNOME)
 cat > /usr/share/glib-2.0/schemas/99_simplemode.gschema.override << EOF
 [org.gnome.desktop.background]
-picture-uri='file:///usr/share/backgrounds/simplemode-wallpaper.png'
-picture-uri-dark='file:///usr/share/backgrounds/simplemode-wallpaper.png'
+picture-uri='file:///usr/share/backgrounds/smos-default.png'
+picture-uri-dark='file:///usr/share/backgrounds/smos-default.png'
 EOF
 
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 ```
+
+> **Note:** The Plymouth boot-splash theme referenced below is not part of
+> this prototype yet (see `docs/roadmap.md`, Phase 2). The `debian/branding/plymouth`
+> directory does not exist yet — skip this section until the theme is added.
 
 ### Install Boot Splash
 

@@ -1,3 +1,8 @@
 # Ignore demo directory and graphify output from GitHub's language statistics
 demo/* linguist-vendored
 graphify-out/* linguist-generated
+
+# Shell and Python files must keep LF line endings — CRLF breaks bash
+# shebang execution on Linux (/bin/bash^M: bad interpreter)
+*.sh text eol=lf
+*.py text eol=lf

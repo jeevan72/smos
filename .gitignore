@@ -11,9 +11,6 @@ cubic-project/
 
 # Profile (user-specific)
 .simplemode-profile
-*.pyc
-*.pyo
-.env
 
 # Node
 node_modules/
