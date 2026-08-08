@@ -18,26 +18,35 @@ SimpleMode OS is a customized Ubuntu-based operating system (built with **Cubic*
 - **Smart Typo Correction** — Levenshtein + RapidFuzz fuzzy matching
 - **PageTree Knowledge System** — Keyword-mapped documentation (no LLM required)
 
-## 🚀 Quick Install (Local Setup)
+## 🚀 One-command install
 
-To install and test SimpleMode OS features on your current Ubuntu system, simply run the following commands in your terminal:
-
-```bash
-git clone https://github.com/jeevan72/smos.git
-cd smos
-chmod +x setup.sh
-./setup.sh
-```
-
-> **Note:** Do not run `setup.sh` with `sudo` (e.g., `sudo ./setup.sh`). The script will automatically prompt for your password when administrative permissions are needed.
-
-### Install the System Toolbox (Linutil) with one command
+Install the complete SimpleMode desktop experience on Ubuntu or Debian with one command:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jeevan72/smos/main/install.sh | sh
 ```
 
-This downloads the pinned, checksum-verified Linutil release into `~/.local/bin`, adds it to your PATH, and creates a desktop launcher. Then open the toolbox with `linutil`.
+The installer adds the GTK onboarding app, terminal wizard fallback, assistant, knowledge base, curated software setup, and checksum-verified Linutil toolbox. It installs per-user launchers under `~/.local/bin` and does not need to be run with `sudo`.
+
+After installation, open a new terminal and run:
+
+```bash
+simplemode-onboarding
+```
+
+You can also launch **SimpleMode setup** from the application menu, use `simplemode-wizard` as the terminal fallback, or run `linutil` to open the system toolbox.
+
+### Developer checkout
+
+For development or ISO creation:
+
+```bash
+git clone https://github.com/jeevan72/smos.git
+cd smos
+./setup.sh
+```
+
+> `setup.sh` installs dependencies into the checkout and is intended for development. The one-command installer is the recommended end-user path.
 
 ## 🛠️ How to Build the OS ISO (For Developers)
 

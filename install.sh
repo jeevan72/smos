@@ -1,10 +1,12 @@
 #!/bin/sh -e
 #======================================================
-# SimpleMode OS — Linutil Toolbox Installer
+# SimpleMode OS — Single-Command Installer
 #
-# Installs Chris Titus Tech's Linutil (terminal toolbox)
-# to ~/.local/bin with checksum verification, and creates
-# a desktop launcher.
+# Installs the complete SimpleMode desktop experience:
+#   - GTK4 graphical onboarding
+#   - Terminal wizard fallback
+#   - Built-in assistant and knowledge base
+#   - Linutil system toolbox
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/jeevan72/smos/main/install.sh | sh
@@ -16,10 +18,37 @@ GREEN='\033[32m'
 YELLOW='\033[33m'
 CYAN='\033[36m'
 
+SMOS_VERSION="main"
+SMOS_ARCHIVE_URL="https://github.com/jeevan72/smos/archive/refs/heads/${SMOS_VERSION}.tar.gz"
+SMOS_INSTALL_DIR="${HOME}/.local/share/simplemode"
+SMOS_BIN_DIR="${HOME}/.local/bin"
+SMOS_DESKTOP_DIR="${HOME}/.local/share/applications"
+
 LINUTIL_VERSION="2026.07.17"
-RELEASE_BASE_URL="https://github.com/ChrisTitusTech/linutil/releases/download/${LINUTIL_VERSION}"
-BIN_DIR="${HOME}/.local/bin"
-DESKTOP_DIR="${HOME}/.local/share/applications"
+LINUTIL_RELEASE_BASE="https://github.com/ChrisTitusTech/linutil/releases/download/${LINUTIL_VERSION}"
+
+fail() {
+    printf "%b\n" "${RED}Error: $1${RC}" >&2
+    exit 1
+}
+
+info() {
+    printf "%b\n" "${CYAN}$1${RC}"
+}
+
+success() {
+    printf "%b\n" "${GREEN}$1${RC}"
+}
+
+if [ "$(id -u)" -eq 0 ]; then
+    fail "Do not run this installer as root. Run it as your normal desktop user."
+fi
+
+command -v curl >/dev/null 2>&1 || fail "curl is required. Install curl and run this command again."
+command -v sudo >/dev/null 2>&1 || fail "sudo is required to install system dependencies."
+command -v apt-get >/dev/null 2>&1 || fail "This installer supports Debian/Ubuntu systems with apt-get."
+command -v tar >/dev/null 2>&1 || fail "tar is required to extract the SimpleMode source."
+command -v sha256sum >/dev/null 2>&1 || fail "sha256sum is required for release verification."
 
 case "$(uname -m)" in
     x86_64|amd64)
@@ -31,69 +60,115 @@ case "$(uname -m)" in
         LINUTIL_SHA256="0504580240adc8977c831d18030469dd3c3848ce8fed3b310d94374899a8b708"
         ;;
     *)
-        printf "%b\n" "${RED}Unsupported architecture: $(uname -m).${RC}"
-        exit 1
+        fail "Unsupported architecture: $(uname -m)."
         ;;
 esac
-LINUTIL_URL="${RELEASE_BASE_URL}/${LINUTIL_ASSET}"
 
-# Skip downloading only when the managed binary matches the pinned release.
-if [ -f "${BIN_DIR}/linutil" ] && printf '%s  %s\n' "${LINUTIL_SHA256}" "${BIN_DIR}/linutil" | sha256sum -c - >/dev/null 2>&1; then
-    printf "%b\n" "${GREEN}linutil ${LINUTIL_VERSION} is already installed.${RC}"
-else
-    # Never treat an unrelated executable earlier on PATH as our installation.
-    if ! command -v curl >/dev/null 2>&1; then
-        printf "%b\n" "${RED}curl is required to install Linutil.${RC}"
-        exit 1
-    fi
+info "Installing SimpleMode OS for ${USER}..."
 
-    printf "%b\n" "${CYAN}Installing Linutil ${LINUTIL_VERSION}...${RC}"
-    mkdir -p "${BIN_DIR}"
+info "Installing system dependencies..."
+sudo apt-get update
+sudo apt-get install -y \
+    python3 \
+    python3-gi \
+    gir1.2-gtk-4.0 \
+    policykit-1 \
+    python3-pip \
+    python3-venv \
+    whiptail \
+    dialog \
+    git \
+    curl \
+    wget \
+    flatpak \
+    gnome-terminal
 
-    TMP_BIN="$(mktemp)"
-    trap 'rm -f "${TMP_BIN}"' EXIT
+TMP_ROOT="$(mktemp -d)"
+cleanup() {
+    rm -rf "${TMP_ROOT}"
+}
+trap cleanup EXIT
 
-    if ! curl -fsSL -o "${TMP_BIN}" "${LINUTIL_URL}"; then
-        printf "%b\n" "${RED}Failed to download Linutil.${RC}"
-        exit 1
-    fi
+ARCHIVE="${TMP_ROOT}/simplemode.tar.gz"
+SOURCE_DIR="${TMP_ROOT}/source"
 
-    # Verify checksum before installing
-    if ! printf '%s  %s\n' "${LINUTIL_SHA256}" "${TMP_BIN}" | sha256sum -c - >/dev/null 2>&1; then
-        printf "%b\n" "${RED}Checksum mismatch — download may be corrupted.${RC}"
-        exit 1
-    fi
+info "Downloading SimpleMode source..."
+curl -fsSL -o "${ARCHIVE}" "${SMOS_ARCHIVE_URL}" || fail "Could not download SimpleMode source."
+mkdir -p "${SOURCE_DIR}"
+tar -xzf "${ARCHIVE}" -C "${SOURCE_DIR}" --strip-components=1 || fail "Could not extract SimpleMode source."
 
-    install -m 0755 "${TMP_BIN}" "${BIN_DIR}/linutil"
-    trap - EXIT
-    rm -f "${TMP_BIN}"
+mkdir -p "${SMOS_INSTALL_DIR}"
+cp -a "${SOURCE_DIR}/." "${SMOS_INSTALL_DIR}/"
+chmod +x \
+    "${SMOS_INSTALL_DIR}/simplemode-onboarding" \
+    "${SMOS_INSTALL_DIR}/simplemode-wizard.sh" \
+    "${SMOS_INSTALL_DIR}/simplemode-assistant.sh" \
+    "${SMOS_INSTALL_DIR}/run.sh"
+
+info "Preparing the SimpleMode Python environment..."
+if [ ! -d "${SMOS_INSTALL_DIR}/venv" ]; then
+    python3 -m venv "${SMOS_INSTALL_DIR}/venv"
+fi
+"${SMOS_INSTALL_DIR}/venv/bin/pip" install --quiet --upgrade pip
+"${SMOS_INSTALL_DIR}/venv/bin/pip" install --quiet rapidfuzz rich markdown
+
+info "Installing Linutil system toolbox..."
+mkdir -p "${SMOS_BIN_DIR}"
+LINUTIL_TARGET="${SMOS_BIN_DIR}/linutil"
+if [ ! -f "${LINUTIL_TARGET}" ] || ! printf '%s  %s\n' "${LINUTIL_SHA256}" "${LINUTIL_TARGET}" | sha256sum -c - >/dev/null 2>&1; then
+    LINUTIL_TMP="${TMP_ROOT}/linutil"
+    curl -fsSL -o "${LINUTIL_TMP}" "${LINUTIL_RELEASE_BASE}/${LINUTIL_ASSET}" || fail "Could not download Linutil."
+    printf '%s  %s\n' "${LINUTIL_SHA256}" "${LINUTIL_TMP}" | sha256sum -c - >/dev/null 2>&1 || fail "Linutil checksum verification failed."
+    install -m 0755 "${LINUTIL_TMP}" "${LINUTIL_TARGET}"
 fi
 
-# Desktop launcher (appears in the app menu)
-mkdir -p "${DESKTOP_DIR}"
-cat > "${DESKTOP_DIR}/linutil.desktop" <<LINUTILDESKTOP
+cat > "${SMOS_BIN_DIR}/simplemode-onboarding" <<LAUNCHER
+#!/bin/sh
+set -e
+export PYTHONPATH="${SMOS_INSTALL_DIR}:\${PYTHONPATH:-}"
+exec python3 -m onboarding.app "\$@"
+LAUNCHER
+
+cat > "${SMOS_BIN_DIR}/simplemode-wizard" <<LAUNCHER
+#!/bin/sh
+exec bash "${SMOS_INSTALL_DIR}/simplemode-wizard.sh" "\$@"
+LAUNCHER
+
+cat > "${SMOS_BIN_DIR}/simplemode-assistant" <<LAUNCHER
+#!/bin/sh
+set -e
+if [ -f "\$HOME/.simplemode-profile" ]; then
+    . "\$HOME/.simplemode-profile"
+fi
+exec "${SMOS_INSTALL_DIR}/venv/bin/python" "${SMOS_INSTALL_DIR}/assistant/assistant.py" \\
+    --knowledge "${SMOS_INSTALL_DIR}/knowledge" \\
+    --mode "\${USER_TYPE:-beginner}" "\$@"
+LAUNCHER
+
+chmod 0755 "${SMOS_BIN_DIR}/simplemode-onboarding" "${SMOS_BIN_DIR}/simplemode-wizard" "${SMOS_BIN_DIR}/simplemode-assistant"
+
+mkdir -p "${SMOS_DESKTOP_DIR}"
+cat > "${SMOS_DESKTOP_DIR}/simplemode-onboarding.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
-Name=System Toolbox
-GenericName=Linux Utility Toolbox
-Comment=Chris Titus Tech's Linutil — setup, optimize, and maintain your system
-Exec=${BIN_DIR}/linutil
-Icon=utilities-terminal
-Terminal=true
-Categories=System;Utility;
-Keywords=linutil;toolbox;titus;maintenance;
-LINUTILDESKTOP
+Name=SimpleMode setup
+Comment=Choose your desktop style, accessibility mode, and software
+Exec=${SMOS_BIN_DIR}/simplemode-onboarding
+Icon=preferences-desktop
+Terminal=false
+Categories=Settings;System;
+Keywords=SimpleMode;setup;onboarding;desktop;
+DESKTOP
 
-printf "%b\n" "${GREEN}Linutil installed: $(${BIN_DIR}/linutil --version 2>/dev/null | head -n1)${RC}"
-
-# Ensure ~/.local/bin is on PATH
 case ":${PATH}:" in
-    *":${BIN_DIR}:"*) ;;
+    *":${SMOS_BIN_DIR}:"*) ;;
     *)
-        printf "%b\n" "${YELLOW}Adding ${BIN_DIR} to PATH in ~/.bashrc...${RC}"
-        printf '\n# Add ~/.local/bin to PATH (Linutil toolbox)\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "${HOME}/.bashrc"
-        printf "%b\n" "${YELLOW}Run 'source ~/.bashrc' (or open a new terminal), then: linutil${RC}"
+        printf '\n# SimpleMode OS user commands\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "${HOME}/.profile"
         ;;
 esac
 
-printf "%b\n" "${GREEN}Open the toolbox anytime with: linutil${RC}"
+success "SimpleMode OS installed."
+printf "%b\n" "${YELLOW}Open a new terminal, then run: simplemode-onboarding${RC}"
+printf "%b\n" "${YELLOW}Or launch 'SimpleMode setup' from your application menu.${RC}"
+printf "%b\n" "${YELLOW}Terminal fallback: simplemode-wizard${RC}"
+printf "%b\n" "${YELLOW}System toolbox: linutil${RC}"
