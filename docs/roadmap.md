@@ -28,8 +28,9 @@
 
 ### 5. Linutil System Toolbox
 - ✅ Pre-installed **Linutil** (Chris Titus Tech's Rust toolbox) in the ISO and dev setup
-- ✅ Dedicated **SimpleMode tab** in the Linutil catalog (updates, cleanup, repair wizard, system info)
-- ✅ Assistant + interceptor recognize the `toolbox` / `linutil` keyword
+- ✅ Pre-installed release binary with checksum verification
+- 🚧 Dedicated **SimpleMode tab** in the Linutil catalog (planned as an upstream contribution)
+- 🚧 Assistant + interceptor integration for the `toolbox` / `linutil` keyword
 - 🔄 Track Linutil releases and bump the pinned binary version in `chroot-setup.sh`/`setup.sh`
 - 🚀 Build Linutil from source in the image (offline, reproducible) instead of downloading the release binary
 

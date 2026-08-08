@@ -5,8 +5,8 @@
 # Tested on: Ubuntu 24.04+ / Debian 12+
 #
 # Usage:
-#   git clone https://github.com/YOUR_USER/simplemode-os.git
-#   cd simplemode-os
+#   git clone https://github.com/jeevan72/smos.git
+#   cd smos
 #   chmod +x setup.sh
 #   ./setup.sh
 #======================================================
@@ -153,15 +153,32 @@ echo ""
 echo -e "${BOLD}━━━ Step 3.5: Linutil Toolbox ━━━${NC}"
 
 # Linutil is Chris Titus Tech's terminal toolbox (distro-agnostic task catalog).
-# We install the official x86_64 release binary into ~/.local/bin.
 # Pinned release: https://github.com/ChrisTitusTech/linutil/releases
 LINUTIL_VERSION="2026.07.17"
-LINUTIL_URL="https://github.com/ChrisTitusTech/linutil/releases/download/${LINUTIL_VERSION}/linutil"
-LINUTIL_SHA256="3e7dd8da45b644e7af3ff29bfba391ebd13772865eeefb55ea88a48c74f7d1ff"
+LINUTIL_RELEASE_BASE="https://github.com/ChrisTitusTech/linutil/releases/download/${LINUTIL_VERSION}"
 
 install_linutil() {
-    if command -v linutil &> /dev/null && linutil --version >/dev/null 2>&1; then
-        print_info "linutil already installed: $(linutil --version 2>/dev/null | head -n1)"
+    local bin_dir="${HOME}/.local/bin"
+    local target="${bin_dir}/linutil"
+    local asset
+    local sha256
+    case "$(uname -m)" in
+        x86_64|amd64)
+            asset="linutil"
+            sha256="3e7dd8da45b644e7af3ff29bfba391ebd13772865eeefb55ea88a48c74f7d1ff"
+            ;;
+        aarch64|arm64)
+            asset="linutil-aarch64"
+            sha256="0504580240adc8977c831d18030469dd3c3848ce8fed3b310d94374899a8b708"
+            ;;
+        *)
+            print_err "Unsupported architecture: $(uname -m)."
+            return 1
+            ;;
+    esac
+
+    if [ -f "${target}" ] && printf '%s  %s\n' "${sha256}" "${target}" | sha256sum -c - >/dev/null 2>&1; then
+        print_info "linutil ${LINUTIL_VERSION} is already installed"
         return 0
     fi
 
@@ -170,34 +187,34 @@ install_linutil() {
         return 1
     fi
 
-    mkdir -p "${HOME}/.local/bin"
-    local tmp="/tmp/linutil"
+    mkdir -p "${bin_dir}"
+    local tmp
+    tmp="$(mktemp)"
+    trap 'rm -f "${tmp}"' EXIT
     echo "  Downloading Linutil ${LINUTIL_VERSION}..."
-    if ! curl -fsSL -o "${tmp}" "${LINUTIL_URL}"; then
+    if ! curl -fsSL -o "${tmp}" "${LINUTIL_RELEASE_BASE}/${asset}"; then
         print_err "Failed to download Linutil — skipping."
         return 1
     fi
 
-    # Verify the binary checksum before installing
-    echo "${LINUTIL_SHA256}  ${tmp}" | sha256sum -c - >/dev/null 2>&1 || {
+    if ! printf '%s  %s\n' "${sha256}" "${tmp}" | sha256sum -c - >/dev/null 2>&1; then
         print_err "Linutil checksum mismatch — skipping install."
-        rm -f "${tmp}"
         return 1
-    }
+    fi
 
-    install -m 0755 "${tmp}" "${HOME}/.local/bin/linutil"
+    install -m 0755 "${tmp}" "${target}"
+    trap - EXIT
     rm -f "${tmp}"
-    print_step "Linutil installed: $(${HOME}/.local/bin/linutil --version 2>/dev/null | head -n1)"
+    print_step "Linutil installed: $(${target} --version 2>/dev/null | head -n1)"
 
-    # Desktop launcher (appears in the app menu)
     mkdir -p "${HOME}/.local/share/applications"
-    cat > "${HOME}/.local/share/applications/linutil.desktop" <<'LINUTILDESKTOP'
+    cat > "${HOME}/.local/share/applications/linutil.desktop" <<LINUTILDESKTOP
 [Desktop Entry]
 Type=Application
 Name=System Toolbox
 GenericName=Linux Utility Toolbox
 Comment=Chris Titus Tech's Linutil — setup, optimize, and maintain your system
-Exec=linutil
+Exec=${target}
 Icon=utilities-terminal
 Terminal=true
 Categories=System;Utility;
@@ -206,16 +223,19 @@ LINUTILDESKTOP
     print_step "Linutil desktop launcher created"
 }
 
-install_linutil
+install_linutil || print_err "Linutil was not installed; continuing setup."
 
 # Make sure ~/.local/bin is on PATH
-if ! echo "${PATH}" | grep -q "${HOME}/.local/bin"; then
-    print_info "Adding ~/.local/bin to PATH in ~/.bashrc..."
-    echo '' >> ~/.bashrc
-    echo '# Add ~/.local/bin to PATH (Linutil toolbox)' >> ~/.bashrc
-    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-    export PATH="$HOME/.local/bin:$PATH"
-fi
+case ":${PATH}:" in
+    *":${HOME}/.local/bin:"*) ;;
+    *)
+        print_info "Adding ~/.local/bin to PATH in ~/.bashrc..."
+        echo '' >> ~/.bashrc
+        echo '# Add ~/.local/bin to PATH (Linutil toolbox)' >> ~/.bashrc
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+        export PATH="$HOME/.local/bin:$PATH"
+        ;;
+esac
 
 #------------------------------------------------------
 # Step 4: Verify project

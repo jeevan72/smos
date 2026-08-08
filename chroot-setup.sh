@@ -192,17 +192,31 @@ echo ""
 echo "━━━ Step 5/7: Installing Linutil Toolbox ━━━"
 
 # Linutil is Chris Titus Tech's terminal toolbox (distro-agnostic task catalog).
-# We install the official x86_64 release binary directly (it's a single static
-# binary, so no apt package / Rust toolchain needed inside the chroot).
 # Pinned release: https://github.com/ChrisTitusTech/linutil/releases
 LINUTIL_VERSION="2026.07.17"
-LINUTIL_URL="https://github.com/ChrisTitusTech/linutil/releases/download/${LINUTIL_VERSION}/linutil"
-LINUTIL_SHA256="3e7dd8da45b644e7af3ff29bfba391ebd13772865eeefb55ea88a48c74f7d1ff"
-LINUTIL_TMP="/tmp/linutil"
+LINUTIL_RELEASE_BASE="https://github.com/ChrisTitusTech/linutil/releases/download/${LINUTIL_VERSION}"
 
 install_linutil() {
-    if command -v linutil &> /dev/null && linutil --version >/dev/null 2>&1; then
-        echo "[i] linutil already installed: $(linutil --version 2>/dev/null | head -n1)"
+    local asset
+    local sha256
+    case "$(uname -m)" in
+        x86_64|amd64)
+            asset="linutil"
+            sha256="3e7dd8da45b644e7af3ff29bfba391ebd13772865eeefb55ea88a48c74f7d1ff"
+            ;;
+        aarch64|arm64)
+            asset="linutil-aarch64"
+            sha256="0504580240adc8977c831d18030469dd3c3848ce8fed3b310d94374899a8b708"
+            ;;
+        *)
+            echo "[!] Unsupported architecture: $(uname -m)."
+            return 1
+            ;;
+    esac
+
+    local target="/usr/local/bin/linutil"
+    if [ -f "${target}" ] && printf '%s  %s\n' "${sha256}" "${target}" | sha256sum -c - >/dev/null 2>&1; then
+        echo "[i] linutil ${LINUTIL_VERSION} is already installed"
         return 0
     fi
 
@@ -211,49 +225,43 @@ install_linutil() {
         return 1
     fi
 
+    local tmp
+    tmp="$(mktemp)"
+    trap 'rm -f "${tmp}"' EXIT
     echo "[*] Downloading Linutil ${LINUTIL_VERSION}..."
-    if ! curl -fsSL -o "${LINUTIL_TMP}" "${LINUTIL_URL}"; then
+    if ! curl -fsSL -o "${tmp}" "${LINUTIL_RELEASE_BASE}/${asset}"; then
         echo "[!] Failed to download Linutil — skipping (SMOS still works)."
         return 1
     fi
 
-    # Verify the binary checksum before installing
-    echo "${LINUTIL_SHA256}  ${LINUTIL_TMP}" | sha256sum -c - >/dev/null 2>&1 || {
+    if ! printf '%s  %s\n' "${sha256}" "${tmp}" | sha256sum -c - >/dev/null 2>&1; then
         echo "[!] Linutil checksum mismatch — skipping install."
-        rm -f "${LINUTIL_TMP}"
         return 1
-    }
+    fi
 
-    install -m 0755 "${LINUTIL_TMP}" /usr/local/bin/linutil
-    rm -f "${LINUTIL_TMP}"
-    echo "[✓] Linutil installed: $(linutil --version 2>/dev/null | head -n1)"
+    install -m 0755 "${tmp}" "${target}"
+    trap - EXIT
+    rm -f "${tmp}"
+    echo "[✓] Linutil installed: $(${target} --version 2>/dev/null | head -n1)"
 }
 
-install_linutil
+install_linutil || echo "[!] Linutil was not installed; continuing chroot setup."
 
 # Desktop launcher for the toolbox
 mkdir -p /usr/share/applications
-cat > /usr/share/applications/linutil.desktop <<'LINUTILDESKTOP'
+cat > /usr/share/applications/linutil.desktop <<LINUTILDESKTOP
 [Desktop Entry]
 Type=Application
 Name=System Toolbox
 GenericName=Linux Utility Toolbox
 Comment=Chris Titus Tech's Linutil — setup, optimize, and maintain your system
-Exec=linutil
+Exec=/usr/local/bin/linutil
 Icon=utilities-terminal
 Terminal=true
 Categories=System;Utility;
 Keywords=linutil;toolbox;titus;maintenance;
 LINUTILDESKTOP
 echo "[✓] Linutil desktop launcher installed"
-
-# Add to GNOME favorites (the launcher appears in the dock)
-SCHEMA_FILE=/usr/share/glib-2.0/schemas/99_simplemode.gschema.override
-if [ -f "${SCHEMA_FILE}" ] && ! grep -q "linutil.desktop" "${SCHEMA_FILE}"; then
-    sed -i "s|favorite-apps=\['\(.*\)'\]|favorite-apps=['linutil.desktop', '\1']|" "${SCHEMA_FILE}"
-    glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true
-    echo "[✓] Linutil added to GNOME favorites"
-fi
 
 #------------------------------------------------------
 # 6. Desktop Customization (GNOME)
@@ -288,7 +296,7 @@ titlebar-font='Noto Sans Bold 11'
 button-layout='close,minimize,maximize:'
 
 [org.gnome.shell]
-favorite-apps=['firefox.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'libreoffice-writer.desktop', 'org.gnome.Settings.desktop']
+favorite-apps=['linutil.desktop', 'firefox.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'libreoffice-writer.desktop', 'org.gnome.Settings.desktop']
 SCHEMAEOF
 
 glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true
