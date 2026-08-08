@@ -26,7 +26,7 @@ SIMPLEMODE_DIR="/opt/simplemode"
 #------------------------------------------------------
 # 1. Apply Branding
 #------------------------------------------------------
-echo "━━━ Step 1/6: Applying Branding ━━━"
+echo "━━━ Step 1/7: Applying Branding ━━━"
 
 # Custom os-release
 if [ -f "${PROJECT_DIR}/debian/branding/os-release" ]; then
@@ -76,7 +76,7 @@ fi
 # 2. Update & Install Packages
 #------------------------------------------------------
 echo ""
-echo "━━━ Step 2/6: Installing Packages ━━━"
+echo "━━━ Step 2/7: Installing Packages ━━━"
 
 # Remove the cdrom repository which causes apt update to fail inside the Cubic chroot
 sed -i '/cdrom/d' /etc/apt/sources.list 2>/dev/null || true
@@ -88,7 +88,7 @@ apt update || echo "[!] apt update had some errors, continuing anyway..."
 
 # Core packages
 apt install -y \
-    python3 python3-pip python3-venv \
+    python3 python3-pip python3-venv python3-gi gir1.2-gtk-4.0 policykit-1 \
     whiptail dialog figlet \
     firefox vlc gimp libreoffice \
     gnome-tweaks gnome-shell-extensions gnome-shell-extension-dash-to-panel gnome-shell-extension-ubuntu-dock \
@@ -107,7 +107,7 @@ echo "[✓] Packages installed"
 # 3. Remove Unwanted Packages
 #------------------------------------------------------
 echo ""
-echo "━━━ Step 3/6: Removing Bloat ━━━"
+echo "━━━ Step 3/7: Removing Bloat ━━━"
 
 apt remove -y \
     gnome-games aisleriot gnome-mines gnome-sudoku \
@@ -120,15 +120,17 @@ echo "[✓] Bloat removed"
 # 4. Install SimpleMode Tools
 #------------------------------------------------------
 echo ""
-echo "━━━ Step 4/6: Installing SimpleMode Tools ━━━"
+echo "━━━ Step 4/7: Installing SimpleMode Tools ━━━"
 
 mkdir -p "${SIMPLEMODE_DIR}"
 
 # Copy simplemode tools from the repository
 cp -r "${PROJECT_DIR}/assistant" "${SIMPLEMODE_DIR}/"
 cp -r "${PROJECT_DIR}/knowledge" "${SIMPLEMODE_DIR}/"
+cp -r "${PROJECT_DIR}/onboarding" "${SIMPLEMODE_DIR}/"
 cp "${PROJECT_DIR}/simplemode-assistant.sh" "${SIMPLEMODE_DIR}/"
 cp "${PROJECT_DIR}/simplemode-wizard.sh" "${SIMPLEMODE_DIR}/"
+cp "${PROJECT_DIR}/simplemode-onboarding" "${SIMPLEMODE_DIR}/"
 echo "[✓] SimpleMode files copied to ${SIMPLEMODE_DIR}"
 
 # Set up Python venv for the assistant
@@ -157,7 +159,14 @@ bash /opt/simplemode/simplemode-wizard.sh
 WIZEOF
 chmod +x /usr/local/bin/simplemode-wizard
 
-echo "[✓] Commands installed: simplemode-assistant, simplemode-wizard"
+cat > /usr/local/bin/simplemode-onboarding <<'GUIEOF'
+#!/bin/bash
+export PYTHONPATH="/opt/simplemode:${PYTHONPATH:-}"
+exec python3 -m onboarding.app "$@"
+GUIEOF
+chmod +x /usr/local/bin/simplemode-onboarding
+
+echo "[✓] Commands installed: simplemode-assistant, simplemode-wizard, simplemode-onboarding"
 
 # Configure command interceptor globally in /etc/bash.bashrc
 cat >> /etc/bash.bashrc <<'GLOBALBASHRC'

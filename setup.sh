@@ -64,6 +64,9 @@ sudo apt install -y \
     python3 \
     python3-pip \
     python3-venv \
+    python3-gi \
+    gir1.2-gtk-4.0 \
+    policykit-1 \
     git \
     curl \
     wget \
@@ -112,6 +115,7 @@ chmod +x "${PROJECT_DIR}/debian/welcome/welcome.sh" 2>/dev/null || true
 chmod +x "${PROJECT_DIR}/chroot-setup.sh" 2>/dev/null || true
 chmod +x "${PROJECT_DIR}/run.sh" 2>/dev/null || true
 chmod +x "${PROJECT_DIR}/assistant/interceptor.py" 2>/dev/null || true
+chmod +x "${PROJECT_DIR}/simplemode-onboarding" 2>/dev/null || true
 
 # Add interceptor to ~/.bashrc if not already present
 if ! grep -q "interceptor.py" ~/.bashrc 2>/dev/null; then
@@ -246,6 +250,9 @@ echo -e "${BOLD}━━━ Step 4/4: Project Verification ━━━${NC}"
 REQUIRED_FILES=(
     "simplemode-wizard.sh"
     "simplemode-assistant.sh"
+    "simplemode-onboarding"
+    "onboarding/app.py"
+    "onboarding/catalog.toml"
     "chroot-setup.sh"
     "knowledge/index.json"
     "debian/packages.list"

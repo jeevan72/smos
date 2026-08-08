@@ -1,0 +1,95 @@
+[[apps]]
+id = "firefox"
+name = "Firefox"
+group = "Web"
+description = "A privacy-focused web browser."
+backend = "apt"
+package = "firefox"
+probe = "firefox"
+state = "builtin"
+requires_root = true
+multi_select = true
+
+[[apps]]
+id = "libreoffice"
+name = "LibreOffice"
+group = "Office"
+description = "A complete open-source office suite."
+backend = "apt"
+package = "libreoffice"
+probe = "libreoffice"
+state = "builtin"
+requires_root = true
+multi_select = true
+
+[[apps]]
+id = "vlc"
+name = "VLC"
+group = "Media"
+description = "A versatile video and audio player."
+backend = "apt"
+package = "vlc"
+probe = "vlc"
+state = "builtin"
+requires_root = true
+multi_select = true
+
+[[apps]]
+id = "gimp"
+name = "GIMP"
+group = "Design"
+description = "An image editor for photographs and artwork."
+backend = "apt"
+package = "gimp"
+probe = "gimp"
+state = "builtin"
+requires_root = true
+multi_select = true
+
+[[apps]]
+id = "thunderbird"
+name = "Thunderbird"
+group = "Communication"
+description = "An open-source email and calendar application."
+backend = "apt"
+package = "thunderbird"
+probe = "thunderbird"
+state = "optional"
+requires_root = true
+multi_select = true
+
+[[apps]]
+id = "obs-studio"
+name = "OBS Studio"
+group = "Media"
+description = "Record and stream your desktop."
+backend = "apt"
+package = "obs-studio"
+probe = "obs"
+state = "optional"
+requires_root = true
+multi_select = true
+
+[[apps]]
+id = "chromium"
+name = "Chromium"
+group = "Web"
+description = "An open-source web browser."
+backend = "apt"
+package = "chromium-browser"
+probe = "chromium"
+state = "optional"
+requires_root = true
+multi_select = true
+
+[[apps]]
+id = "htop"
+name = "Htop"
+group = "System Tools"
+description = "An interactive process and resource monitor."
+backend = "apt"
+package = "htop"
+probe = "htop"
+state = "builtin"
+requires_root = true
+multi_select = true

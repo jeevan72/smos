@@ -42,7 +42,9 @@
 - Rewrite the Python-based Terminal Interceptor in **Go** or **Rust** to reduce bash execution delay from ~150ms to < 5ms.
 
 ### 2. Graphical UX (The Wizard)
-- Replace the terminal-based `whiptail` wizard with a **Graphical GTK4 / PyQt First-Boot App** featuring visual previews of the Windows/macOS layouts.
+- ✅ GTK4 first-boot app with experience modes, Windows/macOS/Linux-inspired layout presets, and software selection.
+- ✅ Terminal `whiptail` wizard retained as a recovery and headless fallback.
+- 🔄 Add richer desktop previews and support for additional desktop environments.
 
 ### 3. Complete Immersion (Branding)
 - **Plymouth Boot Splash**: Design and inject a custom SMOS loading screen to replace the Ubuntu spinning circle.

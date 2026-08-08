@@ -1,5 +1,7 @@
 # Core System
 ubuntu-desktop
+dialog
+figlet
 ubuntu-drivers-common
 # The interceptor hooks into bash's command_not_found_handle.
 # Install the default handler so unknown commands still give a sensible error.
@@ -23,6 +25,8 @@ cheese
 # Utilities
 gnome-tweaks
 gnome-shell-extensions
+gnome-shell-extension-dash-to-panel
+gnome-shell-extension-ubuntu-dock
 dconf-editor
 synaptic
 gdebi
@@ -43,6 +47,9 @@ vim
 python3
 python3-pip
 python3-venv
+python3-gi
+gir1.2-gtk-4.0
+policykit-1
 
 # Linutil (System Toolbox) is NOT installed via apt — it is distributed as a
 # single release binary. chroot-setup.sh downloads the pinned release into
@@ -68,3 +75,4 @@ cups
 system-config-printer
 hplip
 printer-driver-all
+flatpak

@@ -1,0 +1,33 @@
+[modes.elder]
+text_scaling_factor = 1.25
+cursor_size = 48
+
+[modes.beginner]
+text_scaling_factor = 1.0
+cursor_size = 24
+
+[modes.advanced]
+text_scaling_factor = 1.0
+cursor_size = 24
+
+[styles.windows]
+enable_extensions = ["dash-to-panel@jderose9.github.com"]
+disable_extensions = ["ubuntu-dock@ubuntu.com"]
+button_layout = "appmenu:minimize,maximize,close"
+
+[styles.macos]
+enable_extensions = ["ubuntu-dock@ubuntu.com"]
+disable_extensions = ["dash-to-panel@jderose9.github.com"]
+dock_position = "BOTTOM"
+dock_extend_height = false
+dock_fixed = false
+dock_intellihide = true
+button_layout = "close,minimize,maximize:appmenu"
+
+[styles.linux]
+enable_extensions = ["ubuntu-dock@ubuntu.com"]
+disable_extensions = ["dash-to-panel@jderose9.github.com"]
+dock_position = "LEFT"
+dock_extend_height = true
+dock_fixed = true
+button_layout = "appmenu:minimize,maximize,close"

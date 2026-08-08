@@ -79,7 +79,8 @@ Click **Next** in Cubic to compress the filesystem and generate your custom, boo
 
 When an end-user installs and boots SimpleMode OS, everything works automatically. **The user does not need to run any manual setup scripts.**
 
-- **Adaptive First Boot**: The `simplemode-wizard` launches automatically upon first login, asking for their experience level (Elder/Beginner/Advanced) and preferred layout style.
+- **Adaptive First Boot**: A GTK setup app launches automatically and guides you through experience mode, desktop layout, and optional software. The `simplemode-wizard` terminal flow remains available as a fallback.
+- **Built-in Software Setup**: Included apps are detected automatically, while optional software such as Thunderbird, OBS Studio, and Chromium can be selected and installed from the setup screen.
 - **System Toolbox**: `linutil` is pre-installed — a terminal toolbox with hundreds of tasks for app installs, system optimization, and maintenance.
 - **Smart Terminal**: If the user opens a terminal and types a bad command (e.g., `updat` or `instal vlc`), the OS intercepts it natively, corrects it to `sudo apt update` or `sudo apt install vlc`, and executes it automatically after a 3-second countdown.
 - **AI Assistant**: The user can type `help` at any time in the terminal to invoke the adaptive chat assistant, which has local knowledge about WiFi, Printers, Permissions, Updates, and more.
@@ -92,6 +93,8 @@ simplemode-os/
 ├── install.sh                  # One-liner: installs the Linutil toolbox (curl | sh)
 ├── simplemode-wizard.sh        # Terminal onboarding wizard (whiptail)
 ├── simplemode-assistant.sh     # Terminal assistant launcher
+├── simplemode-onboarding       # GTK first-boot setup launcher
+├── onboarding/                 # GTK app, desktop adapter, and software catalog
 ├── chroot-setup.sh             # Runs inside Cubic chroot
 │
 ├── assistant/

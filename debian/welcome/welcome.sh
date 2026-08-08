@@ -27,31 +27,38 @@ if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
     exit 0
 fi
 
-# Launch the onboarding wizard inside a terminal so whiptail can render.
-# The wizard writes $HOME/.simplemode-profile on completion.
-launch_wizard() {
-    if command -v gnome-terminal &> /dev/null; then
-        gnome-terminal --wait -- bash -c "simplemode-wizard; echo ''; echo 'Press Enter to close...'; read"
-        return
-    elif command -v xfce4-terminal &> /dev/null; then
-        xfce4-terminal -e "bash -c 'simplemode-wizard; echo \"Press Enter to close...\"; read'"
-        return
-    elif command -v xterm &> /dev/null; then
-        xterm -e "bash -c 'simplemode-wizard; echo \"Press Enter to close...\"; read'"
-        return
+# Launch the graphical onboarding app first. The terminal wizard remains the
+# fallback for missing GTK dependencies, SSH recovery, and headless systems.
+launch_onboarding() {
+    if command -v simplemode-onboarding >/dev/null 2>&1; then
+        if simplemode-onboarding; then
+            return 0
+        fi
     fi
 
-    # No terminal emulator available — fall back to a zenity notice.
-    if command -v zenity &> /dev/null; then
-        zenity --info \
-            --title="Welcome to SimpleMode OS" \
-            --text="Welcome to SimpleMode OS!\n\nYour personalized Linux experience starts now.\n\nOpen a terminal and run:  simplemode-wizard" \
-            --width=400 \
-            --height=200
+    if command -v gnome-terminal &> /dev/null; then
+        gnome-terminal --wait -- bash -c "simplemode-wizard; status=\$?; echo ''; echo 'Press Enter to close...'; read; exit \$status"
+        return $?
+    elif command -v xfce4-terminal &> /dev/null; then
+        xfce4-terminal -e "bash -c 'simplemode-wizard; status=\$?; echo \"Press Enter to close...\"; read; exit \$status'"
+        return $?
+    elif command -v xterm &> /dev/null; then
+        xterm -e "bash -c 'simplemode-wizard; status=\$?; echo \"Press Enter to close...\"; read; exit \$status'"
+        return $?
     fi
+
+    return 1
 }
 
-launch_wizard
-
-# Mark as welcomed so it never shows again
-touch "$WELCOME_FLAG"
+if launch_onboarding && [ -f "$PROFILE_FILE" ]; then
+    touch "$WELCOME_FLAG"
+else
+    if command -v zenity &> /dev/null; then
+        zenity --warning \
+            --title="SimpleMode setup was not completed" \
+            --text="Open a terminal and run: simplemode-wizard" \
+            --width=420 \
+            --height=180
+    fi
+    exit 1
+fi
