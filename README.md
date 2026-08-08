@@ -31,6 +31,14 @@ chmod +x setup.sh
 
 > **Note:** Do not run `setup.sh` with `sudo` (e.g., `sudo ./setup.sh`). The script will automatically prompt for your password when administrative permissions are needed.
 
+### Install the System Toolbox (Linutil) with one command
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jeevan72/smos/main/install.sh | sh
+```
+
+This downloads the pinned, checksum-verified Linutil release into `~/.local/bin`, adds it to your PATH, and creates a desktop launcher. Then open the toolbox with `linutil`.
+
 ## 🛠️ How to Build the OS ISO (For Developers)
 
 SimpleMode OS is designed to be built using **Cubic** (Custom Ubuntu ISO Creator). You can use any existing Ubuntu 24.04 ISO.
@@ -81,6 +89,7 @@ When an end-user installs and boots SimpleMode OS, everything works automaticall
 ```
 simplemode-os/
 ├── setup.sh                    # One-click setup (installs everything)
+├── install.sh                  # One-liner: installs the Linutil toolbox (curl | sh)
 ├── simplemode-wizard.sh        # Terminal onboarding wizard (whiptail)
 ├── simplemode-assistant.sh     # Terminal assistant launcher
 ├── chroot-setup.sh             # Runs inside Cubic chroot
