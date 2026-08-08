@@ -147,6 +147,77 @@ fi
 print_step "Scripts made executable"
 
 #------------------------------------------------------
+# Step 3.5: Linutil System Toolbox (dev machine)
+#------------------------------------------------------
+echo ""
+echo -e "${BOLD}━━━ Step 3.5: Linutil Toolbox ━━━${NC}"
+
+# Linutil is Chris Titus Tech's terminal toolbox (distro-agnostic task catalog).
+# We install the official x86_64 release binary into ~/.local/bin.
+# Pinned release: https://github.com/ChrisTitusTech/linutil/releases
+LINUTIL_VERSION="2026.07.17"
+LINUTIL_URL="https://github.com/ChrisTitusTech/linutil/releases/download/${LINUTIL_VERSION}/linutil"
+LINUTIL_SHA256="3e7dd8da45b644e7af3ff29bfba391ebd13772865eeefb55ea88a48c74f7d1ff"
+
+install_linutil() {
+    if command -v linutil &> /dev/null && linutil --version >/dev/null 2>&1; then
+        print_info "linutil already installed: $(linutil --version 2>/dev/null | head -n1)"
+        return 0
+    fi
+
+    if ! command -v curl &> /dev/null; then
+        print_err "curl not available — skipping Linutil install."
+        return 1
+    fi
+
+    mkdir -p "${HOME}/.local/bin"
+    local tmp="/tmp/linutil"
+    echo "  Downloading Linutil ${LINUTIL_VERSION}..."
+    if ! curl -fsSL -o "${tmp}" "${LINUTIL_URL}"; then
+        print_err "Failed to download Linutil — skipping."
+        return 1
+    fi
+
+    # Verify the binary checksum before installing
+    echo "${LINUTIL_SHA256}  ${tmp}" | sha256sum -c - >/dev/null 2>&1 || {
+        print_err "Linutil checksum mismatch — skipping install."
+        rm -f "${tmp}"
+        return 1
+    }
+
+    install -m 0755 "${tmp}" "${HOME}/.local/bin/linutil"
+    rm -f "${tmp}"
+    print_step "Linutil installed: $(${HOME}/.local/bin/linutil --version 2>/dev/null | head -n1)"
+
+    # Desktop launcher (appears in the app menu)
+    mkdir -p "${HOME}/.local/share/applications"
+    cat > "${HOME}/.local/share/applications/linutil.desktop" <<'LINUTILDESKTOP'
+[Desktop Entry]
+Type=Application
+Name=System Toolbox
+GenericName=Linux Utility Toolbox
+Comment=Chris Titus Tech's Linutil — setup, optimize, and maintain your system
+Exec=linutil
+Icon=utilities-terminal
+Terminal=true
+Categories=System;Utility;
+Keywords=linutil;toolbox;titus;maintenance;
+LINUTILDESKTOP
+    print_step "Linutil desktop launcher created"
+}
+
+install_linutil
+
+# Make sure ~/.local/bin is on PATH
+if ! echo "${PATH}" | grep -q "${HOME}/.local/bin"; then
+    print_info "Adding ~/.local/bin to PATH in ~/.bashrc..."
+    echo '' >> ~/.bashrc
+    echo '# Add ~/.local/bin to PATH (Linutil toolbox)' >> ~/.bashrc
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+#------------------------------------------------------
 # Step 4: Verify project
 #------------------------------------------------------
 echo ""
@@ -186,6 +257,9 @@ echo -e "${CYAN}║${NC}     ./simplemode-wizard.sh                            $
 echo -e "${CYAN}║${NC}                                                      ${CYAN}║${NC}"
 echo -e "${CYAN}║${NC}  ${YELLOW}2. Run Terminal Assistant:${NC}                           ${CYAN}║${NC}"
 echo -e "${CYAN}║${NC}     ./simplemode-assistant.sh                         ${CYAN}║${NC}"
+echo -e "${CYAN}║${NC}                                                      ${CYAN}║${NC}"
+echo -e "${CYAN}║${NC}  ${YELLOW}3. Open System Toolbox (Linutil):${NC}                     ${CYAN}║${NC}"
+echo -e "${CYAN}║${NC}     linutil                                          ${CYAN}║${NC}"
 echo -e "${CYAN}║${NC}                                                      ${CYAN}║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${NC}"
 echo ""

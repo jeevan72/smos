@@ -26,6 +26,13 @@
 - ✅ Local documentation for WiFi, Printer, Updates, Software, Permissions
 - ✅ Keyword → document mapping without relying on heavy Local LLMs
 
+### 5. Linutil System Toolbox
+- ✅ Pre-installed **Linutil** (Chris Titus Tech's Rust toolbox) in the ISO and dev setup
+- ✅ Dedicated **SimpleMode tab** in the Linutil catalog (updates, cleanup, repair wizard, system info)
+- ✅ Assistant + interceptor recognize the `toolbox` / `linutil` keyword
+- 🔄 Track Linutil releases and bump the pinned binary version in `chroot-setup.sh`/`setup.sh`
+- 🚀 Build Linutil from source in the image (offline, reproducible) instead of downloading the release binary
+
 ---
 
 ## Phase 2 🔄 (Professional Distro Upgrades)

@@ -44,6 +44,10 @@ python3
 python3-pip
 python3-venv
 
+# Linutil (System Toolbox) is NOT installed via apt — it is distributed as a
+# single release binary. chroot-setup.sh downloads the pinned release into
+# /usr/local/bin/linutil and creates the desktop launcher.
+
 # Network
 network-manager
 network-manager-gnome

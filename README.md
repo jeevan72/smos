@@ -13,6 +13,7 @@ SimpleMode OS is a customized Ubuntu-based operating system (built with **Cubic*
 - **Adaptive Onboarding** — First-boot terminal wizard (whiptail) that configures the desktop
 - **3 User Modes** — Elder (large icons, high contrast), Beginner (simplified with help), Advanced (full Linux)
 - **3 Desktop Styles** — Windows, macOS, or Linux layout
+- **Built-in System Toolbox** — Pre-installed [Linutil](https://github.com/ChrisTitusTech/linutil) (Chris Titus Tech's Rust toolbox) with a SimpleMode tab for updates, cleanup, and system info
 - **Built-in Terminal Assistant** — Chat-based help with typo correction and knowledge base
 - **Smart Typo Correction** — Levenshtein + RapidFuzz fuzzy matching
 - **PageTree Knowledge System** — Keyword-mapped documentation (no LLM required)
@@ -56,6 +57,7 @@ chmod +x chroot-setup.sh
 This automatically:
 - Installs all necessary dependencies (Python, Whiptail, accessibility tools)
 - Removes bloatware
+- Installs the **Linutil System Toolbox** with a SimpleMode tab (updates, cleanup, system info)
 - Configures the **Global Command Interceptor** in `/etc/bash.bashrc`
 - Installs the **PageTree Knowledge Base** and **Typo Correction Engine**
 - Sets the adaptive onboarding wizard to run automatically on first-boot
@@ -70,6 +72,7 @@ Click **Next** in Cubic to compress the filesystem and generate your custom, boo
 When an end-user installs and boots SimpleMode OS, everything works automatically. **The user does not need to run any manual setup scripts.**
 
 - **Adaptive First Boot**: The `simplemode-wizard` launches automatically upon first login, asking for their experience level (Elder/Beginner/Advanced) and preferred layout style.
+- **System Toolbox**: `linutil` is pre-installed — a terminal toolbox with hundreds of tasks (app installs, system optimization, maintenance). A dedicated SimpleMode tab covers SMOS updates, cleanup, and info.
 - **Smart Terminal**: If the user opens a terminal and types a bad command (e.g., `updat` or `instal vlc`), the OS intercepts it natively, corrects it to `sudo apt update` or `sudo apt install vlc`, and executes it automatically after a 3-second countdown.
 - **AI Assistant**: The user can type `help` at any time in the terminal to invoke the adaptive chat assistant, which has local knowledge about WiFi, Printers, Permissions, Updates, and more.
 

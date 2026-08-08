@@ -186,10 +186,80 @@ GLOBALBASHRC
 echo "[✓] Command interceptor configured in /etc/bash.bashrc"
 
 #------------------------------------------------------
-# 5. Desktop Customization (GNOME)
+# 5. Linutil System Toolbox
 #------------------------------------------------------
 echo ""
-echo "━━━ Step 5/6: Desktop Customization ━━━"
+echo "━━━ Step 5/7: Installing Linutil Toolbox ━━━"
+
+# Linutil is Chris Titus Tech's terminal toolbox (distro-agnostic task catalog).
+# We install the official x86_64 release binary directly (it's a single static
+# binary, so no apt package / Rust toolchain needed inside the chroot).
+# Pinned release: https://github.com/ChrisTitusTech/linutil/releases
+LINUTIL_VERSION="2026.07.17"
+LINUTIL_URL="https://github.com/ChrisTitusTech/linutil/releases/download/${LINUTIL_VERSION}/linutil"
+LINUTIL_SHA256="3e7dd8da45b644e7af3ff29bfba391ebd13772865eeefb55ea88a48c74f7d1ff"
+LINUTIL_TMP="/tmp/linutil"
+
+install_linutil() {
+    if command -v linutil &> /dev/null && linutil --version >/dev/null 2>&1; then
+        echo "[i] linutil already installed: $(linutil --version 2>/dev/null | head -n1)"
+        return 0
+    fi
+
+    if ! command -v curl &> /dev/null; then
+        echo "[!] curl not available — skipping Linutil install."
+        return 1
+    fi
+
+    echo "[*] Downloading Linutil ${LINUTIL_VERSION}..."
+    if ! curl -fsSL -o "${LINUTIL_TMP}" "${LINUTIL_URL}"; then
+        echo "[!] Failed to download Linutil — skipping (SMOS still works)."
+        return 1
+    fi
+
+    # Verify the binary checksum before installing
+    echo "${LINUTIL_SHA256}  ${LINUTIL_TMP}" | sha256sum -c - >/dev/null 2>&1 || {
+        echo "[!] Linutil checksum mismatch — skipping install."
+        rm -f "${LINUTIL_TMP}"
+        return 1
+    }
+
+    install -m 0755 "${LINUTIL_TMP}" /usr/local/bin/linutil
+    rm -f "${LINUTIL_TMP}"
+    echo "[✓] Linutil installed: $(linutil --version 2>/dev/null | head -n1)"
+}
+
+install_linutil
+
+# Desktop launcher for the toolbox
+mkdir -p /usr/share/applications
+cat > /usr/share/applications/linutil.desktop <<'LINUTILDESKTOP'
+[Desktop Entry]
+Type=Application
+Name=System Toolbox
+GenericName=Linux Utility Toolbox
+Comment=Chris Titus Tech's Linutil — setup, optimize, and maintain your system
+Exec=linutil
+Icon=utilities-terminal
+Terminal=true
+Categories=System;Utility;
+Keywords=linutil;toolbox;titus;maintenance;
+LINUTILDESKTOP
+echo "[✓] Linutil desktop launcher installed"
+
+# Add to GNOME favorites (the launcher appears in the dock)
+SCHEMA_FILE=/usr/share/glib-2.0/schemas/99_simplemode.gschema.override
+if [ -f "${SCHEMA_FILE}" ] && ! grep -q "linutil.desktop" "${SCHEMA_FILE}"; then
+    sed -i "s|favorite-apps=\['\(.*\)'\]|favorite-apps=['linutil.desktop', '\1']|" "${SCHEMA_FILE}"
+    glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true
+    echo "[✓] Linutil added to GNOME favorites"
+fi
+
+#------------------------------------------------------
+# 6. Desktop Customization (GNOME)
+#------------------------------------------------------
+echo ""
+echo "━━━ Step 6/7: Desktop Customization ━━━"
 
 # Install Wallpaper
 if [ -f "${PROJECT_DIR}/debian/branding/wallpapers/smos-default.png" ]; then
@@ -225,10 +295,10 @@ glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true
 echo "[✓] GNOME defaults configured"
 
 #------------------------------------------------------
-# 6. First-Boot Welcome / Onboarding
+# 7. First-Boot Welcome / Onboarding
 #------------------------------------------------------
 echo ""
-echo "━━━ Step 6/6: Setting Up First-Boot Welcome ━━━"
+echo "━━━ Step 7/7: Setting Up First-Boot Welcome ━━━"
 
 # Install welcome script (kept in sync with debian/welcome/welcome.sh)
 mkdir -p /usr/local/bin
@@ -261,6 +331,7 @@ echo "║    • Custom branding (SimpleMode OS 1.0)     ║"
 echo "║    • Pre-installed applications              ║"
 echo "║    • Onboarding wizard (first-boot)          ║"
 echo "║    • Terminal assistant                      ║"
+echo "║    • Linutil system toolbox                  ║"
 echo "║    • PageTree knowledge base                 ║"
 echo "║    • GNOME desktop customization             ║"
 echo "║                                              ║"
