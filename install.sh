@@ -234,18 +234,18 @@ exec "${SMOS_INSTALL_ROOT}/venv/bin/python" "${SMOS_INSTALL_ROOT}/assistant/assi
     --mode "\$MODE" "\$@"
 EOF
 
-cat > "${SMOS_BIN_DIR}/simplemode" <<'SMLAFEOF'
+cat > "${SMOS_BIN_DIR}/simplemode" <<SMLAFEOF
 #!/bin/sh
 set -e
-PROFILE="${HOME}/.simplemode-profile"
-if [ ! -f "${PROFILE}" ]; then
+PROFILE="\${HOME}/.simplemode-profile"
+if [ ! -f "\${PROFILE}" ]; then
     printf "\033[1;36mNo configuration found. Launching Onboarding Wizard...\033[0m\n"
     exec bash "${SMOS_INSTALL_ROOT}/simplemode-wizard.sh"
 fi
-MODE=$("${SMOS_INSTALL_ROOT}/venv/bin/python" "${SMOS_INSTALL_ROOT}/bin/read-mode.py")
-exec "${SMOS_INSTALL_ROOT}/venv/bin/python" "${SMOS_INSTALL_ROOT}/assistant/assistant.py" \
-    --knowledge "${SMOS_INSTALL_ROOT}/knowledge" \
-    --mode "${MODE}" "$@"
+MODE=\$("${SMOS_INSTALL_ROOT}/venv/bin/python" "${SMOS_INSTALL_ROOT}/bin/read-mode.py")
+exec "${SMOS_INSTALL_ROOT}/venv/bin/python" "${SMOS_INSTALL_ROOT}/assistant/assistant.py" \\
+    --knowledge "${SMOS_INSTALL_ROOT}/knowledge" \\
+    --mode "\${MODE}" "\$@"
 SMLAFEOF
 
 chmod 0755 \
