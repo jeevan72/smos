@@ -101,7 +101,15 @@ fi
 info "Installing SimpleMode OS for ${USER} (${SMOS_LABEL})..."
 
 info "Installing required system packages..."
-REQUIRED_PKGS="python3 python3-gi gir1.2-gtk-4.0 policykit-1 python3-pip python3-venv whiptail curl tar"
+
+# policykit-1 was renamed to polkitd + pkexec in Ubuntu 24.10+
+POLKIT_PKG="policykit-1"
+OS_CODENAME=$(grep -oP 'UBUNTU_CODENAME=\K.*' /etc/os-release 2>/dev/null || true)
+case "${OS_CODENAME}" in
+    oracular|plucky|resolute) POLKIT_PKG="polkitd pkexec" ;;
+esac
+
+REQUIRED_PKGS="python3 python3-gi gir1.2-gtk-4.0 ${POLKIT_PKG} python3-pip python3-venv whiptail curl tar"
 OPTIONAL_PKGS="dialog git wget flatpak gnome-terminal gnome-shell-extensions gnome-shell-extension-dash-to-panel gnome-shell-extension-ubuntu-dock"
 
 # shellcheck disable=SC2086
