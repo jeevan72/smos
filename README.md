@@ -10,9 +10,10 @@
 
 SimpleMode OS is a customized Ubuntu-based operating system (built with **Cubic**) that adapts its interface based on user expertise level. It features:
 
-- **Adaptive Onboarding** — First-boot terminal wizard (whiptail) that configures the desktop
+- **Adaptive Onboarding** — GTK4 first-boot setup for mode, layout, and software, with a terminal wizard fallback
 - **3 User Modes** — Elder (large icons, high contrast), Beginner (simplified with help), Advanced (full Linux)
-- **3 Desktop Styles** — Windows, macOS, or Linux layout
+- **3 Desktop Styles** — Windows-inspired, macOS-inspired, or native Linux layout
+- **Built-in Software Setup** — curated optional apps with safe package installation
 - **Built-in System Toolbox** — Pre-installed [Linutil](https://github.com/ChrisTitusTech/linutil) (Chris Titus Tech's Rust toolbox) for system setup and maintenance
 - **Built-in Terminal Assistant** — Chat-based help with typo correction and knowledge base
 - **Smart Typo Correction** — Levenshtein + RapidFuzz fuzzy matching
@@ -26,7 +27,13 @@ Install the complete SimpleMode desktop experience on Ubuntu or Debian with one 
 curl -fsSL https://raw.githubusercontent.com/jeevan72/smos/main/install.sh | sh
 ```
 
-The installer adds the GTK onboarding app, terminal wizard fallback, assistant, knowledge base, curated software setup, and checksum-verified Linutil toolbox. It installs per-user launchers under `~/.local/bin` and does not need to be run with `sudo`.
+Pinned install (recommended for reproducibility):
+
+```bash
+SMOS_REF=1659df5 curl -fsSL https://raw.githubusercontent.com/jeevan72/smos/main/install.sh | sh
+```
+
+The installer adds the GTK onboarding app, terminal wizard fallback, assistant, knowledge base, curated software setup, and checksum-verified Linutil toolbox. It installs per-user launchers under `~/.local/bin` and only uses `sudo` for system packages.
 
 After installation, open a new terminal and run:
 
