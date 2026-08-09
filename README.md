@@ -30,18 +30,27 @@ curl -fsSL https://raw.githubusercontent.com/jeevan72/smos/main/install.sh | sh
 Pinned install (recommended for reproducibility):
 
 ```bash
-SMOS_REF=1659df5 curl -fsSL https://raw.githubusercontent.com/jeevan72/smos/main/install.sh | sh
+SMOS_REF=4a11c34 curl -fsSL https://raw.githubusercontent.com/jeevan72/smos/main/install.sh | sh
 ```
 
-The installer adds the GTK onboarding app, terminal wizard fallback, assistant, knowledge base, curated software setup, and checksum-verified Linutil toolbox. It installs per-user launchers under `~/.local/bin` and only uses `sudo` for system packages.
+The installer adds the GTK onboarding app, terminal wizard fallback, assistant, knowledge base, typed interceptor hook (autocorrects typos like `instal` → `sudo apt install`), and checksum-verified Linutil toolbox. It installs per-user launchers under `~/.local/bin` and only uses `sudo` for system packages.
 
 After installation, open a new terminal and run:
 
 ```bash
-simplemode-onboarding
+simplemode
 ```
 
-You can also launch **SimpleMode setup** from the application menu, use `simplemode-wizard` as the terminal fallback, or run `linutil` to open the system toolbox.
+Or any of these individually:
+
+```bash
+simplemode-onboarding   # GTK graphical setup
+simplemode-wizard       # Terminal wizard fallback
+simplemode-assistant    # Knowledge base + typo assistant
+linutil                 # System toolbox
+```
+
+`simplemode` is the smart entry point — it launches the wizard if you haven't configured yet, otherwise drops you into the assistant. You can also launch **SimpleMode setup** from the application menu.
 
 ### Developer checkout
 
@@ -105,16 +114,18 @@ When an end-user installs and boots SimpleMode OS, everything works automaticall
 
 ```
 simplemode-os/
-├── setup.sh                    # One-click setup (installs everything)
-├── install.sh                  # One-liner: installs the Linutil toolbox (curl | sh)
+├── setup.sh                    # Dev setup (installs deps into the checkout)
+├── install.sh                  # One-command curl installer with interceptor hook
 ├── simplemode-wizard.sh        # Terminal onboarding wizard (whiptail)
 ├── simplemode-assistant.sh     # Terminal assistant launcher
 ├── simplemode-onboarding       # GTK first-boot setup launcher
+├── run.sh                      # Wizard → assistant auto-runner
 ├── onboarding/                 # GTK app, desktop adapter, and software catalog
 ├── chroot-setup.sh             # Runs inside Cubic chroot
 │
 ├── assistant/
-│   └── assistant.py            # Python terminal assistant (Rich TUI)
+│   ├── assistant.py            # Python terminal assistant (Rich TUI)
+│   └── interceptor.py          # Bash command_not_found_handle typo engine
 │
 ├── knowledge/                  # PageTree knowledge base
 │   ├── index.json              # Keyword → document mapping
